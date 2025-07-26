@@ -7,54 +7,53 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index()
     {
-        return view('posts.index', [
-            'posts' => Post::with('user', 'comments', 'likes')->latest()->paginate(10),
-        ]);
+        $user = Auth::user();
+        $friends = $user->friends()->pluck('friend_id')->toArray();
+        $posts = Post::whereIn('user_id', array_merge([$user->id], $friends))
+                    ->with(['user', 'comments', 'likes'])
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+        return view('posts.index', compact('posts'));
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'content' => 'required|string',
-            'image' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|url',
         ]);
 
-        if ($request->hasFile('image')) {
-            $data['image_url'] = $request->file('image')->store('posts', 'public');
-        }
-
-        $post = auth()->user()->posts()->create($data);
-        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+        $post = Auth::user()->posts()->create($validated);
+        return redirect('/home')->with('status', 'Post created');
     }
 
-    public function comment(Request $request, Post $post)
+    public function edit(Post $post)
     {
-        $request->validate(['content' => 'required|string']);
-        $post->comments()->create([
-            'user_id' => auth()->id(),
-            'content' => $request->content,
+        $this->authorize('update', $post);
+        return view('posts.edit', compact('post'));
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        $this->authorize('update', $post);
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'image_url' => 'nullable|url',
         ]);
-        return redirect()->route('posts.index')->with('success', 'Comment added.');
+
+        $post->update($validated);
+        return redirect('/home')->with('status', 'Post updated');
     }
 
-    public function like(Post $post)
+    public function destroy(Post $post)
     {
-        $post->likes()->create(['user_id' => auth()->id()]);
-        return redirect()->route('posts.index')->with('success', 'Post liked.');
+        $this->authorize('delete', $post);
+        $post->delete();
+        return redirect('/home')->with('status', 'Post deleted');
     }
 
-    public function unlike(Post $post)
-    {
-        $post->likes()->where('user_id', auth()->id())->delete();
-        return redirect()->route('posts.index')->with('success', 'Post unliked.');
-    }
     // API endpoints
     public function apiIndex()
     {
