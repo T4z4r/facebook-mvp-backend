@@ -52,8 +52,11 @@
             {{-- Posts feed --}}
             @foreach ($posts as $post)
             <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                                    <h6 class="fw-bold mb-1"><i class="bi bi-person-circle"></i> {{ $post->user->name }}</h6>
+
+                </div>
                 <div class="card-body">
-                    <h6 class="fw-bold mb-1"><i class="bi bi-person-circle"></i> {{ $post->user->name }}</h6>
                     <p class="mb-2">{{ $post->content }}</p>
                     @if ($post->image_url)
                     <img src="{{ $post->image_url }}" class="img-fluid rounded mb-2" alt="Post image">
