@@ -1,42 +1,42 @@
 <?php
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\CommentController;
-use App\Http\Controllers\LikeController;
-use App\Http\Controllers\FriendController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\GroupController;
-use App\Http\Controllers\GroupPostController;
+
+use App\Http\Controllers\Api\ApiPostController;
+use App\Http\Controllers\Api\ApiFriendController;
+use App\Http\Controllers\Api\ApiMessageController;
+use App\Http\Controllers\Api\ApiGroupController;
+use App\Http\Controllers\Api\ApiNotificationController;
+use App\Http\Controllers\Api\ApiSearchController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'apiRegister']);
-Route::post('/login', [AuthController::class, 'apiLogin']);
-Route::post('/logout', [AuthController::class, 'apiLogout']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
-Route::middleware('auth:api')->group(function () {
-    Route::get('/posts', [PostController::class, 'apiIndex']);
-    Route::post('/posts', [PostController::class, 'apiStore']);
-    Route::put('/posts/{post}', [PostController::class, 'apiUpdate']);
-    Route::delete('/posts/{post}', [PostController::class, 'apiDestroy']);
+    Route::get('/posts', [ApiPostController::class, 'index']);
+    Route::post('/posts', [ApiPostController::class, 'store']);
+    Route::post('/posts/{post}/comments', [ApiPostController::class, 'comment']);
+    Route::post('/posts/{post}/likes', [ApiPostController::class, 'like']);
+    Route::delete('/posts/{post}/likes', [ApiPostController::class, 'unlike']);
 
-    Route::post('/posts/{post}/comments', [CommentController::class, 'apiStore']);
+    Route::get('/friends', [ApiFriendController::class, 'index']);
+    Route::get('/friends/requests', [ApiFriendController::class, 'requests']);
+    Route::post('/friends', [ApiFriendController::class, 'store']);
+    Route::put('/friends/{friend}/accept', [ApiFriendController::class, 'accept']);
 
-    Route::post('/posts/{post}/likes', [LikeController::class, 'apiStore']);
-    Route::delete('/posts/{post}/likes', [LikeController::class, 'apiDestroy']);
+    Route::get('/messages', [ApiMessageController::class, 'index']);
+    Route::post('/messages', [ApiMessageController::class, 'store']);
 
-    Route::get('/friends', [FriendController::class, 'apiIndex']);
-    Route::get('/friends/requests', [FriendController::class, 'apiRequests']);
-    Route::post('/friends', [FriendController::class, 'apiStore']);
-    Route::put('/friends/{friend}/accept', [FriendController::class, 'apiAccept']);
+    Route::get('/groups', [ApiGroupController::class, 'index']);
+    Route::post('/groups', [ApiGroupController::class, 'store']);
+    Route::get('/groups/{group}/posts', [ApiGroupController::class, 'posts']);
+    Route::post('/groups/{group}/posts', [ApiGroupController::class, 'storePost']);
+    Route::post('/groups/{group}/join', [ApiGroupController::class, 'join']);
+    Route::post('/groups/{group}/leave', [ApiGroupController::class, 'leave']);
 
-    Route::get('/messages', [MessageController::class, 'apiIndex']);
-    Route::post('/messages', [MessageController::class, 'apiStore']);
-
-    Route::get('/groups', [GroupController::class, 'apiIndex']);
-    Route::post('/groups', [GroupController::class, 'apiStore']);
-    Route::post('/groups/{group}/join', [GroupController::class, 'apiJoin']);
-    Route::post('/groups/{group}/leave', [GroupController::class, 'apiLeave']);
-
-    Route::get('/groups/{group}/posts', [GroupPostController::class, 'apiIndex']);
-    Route::post('/groups/{group}/posts', [GroupPostController::class, 'apiStore']);
+    // Route::get('/notifications', [ApiNotificationController::class, 'index']);
+    // Route::post('/notifications/{notification}/read', [ApiNotificationController::class, 'markAsRead']);
 });
+
+Route::get('/users/search', [ApiSearchController::class, 'search']);
