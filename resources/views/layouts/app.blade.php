@@ -48,7 +48,7 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm sticky-top">
             <div class="container">
                 <a class="navbar-brand" href="{{ route('home') }}">
                     <i class="bi bi-facebook"></i> Facebook MVP
@@ -58,35 +58,50 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto">
-                        @auth
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('home') }}"><i class="bi bi-house-door-fill"></i> Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('friends.index') }}"><i class="bi bi-people-fill"></i> Friends</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('messages.index') }}"><i class="bi bi-chat-dots-fill"></i> Messages</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('groups.index') }}"><i class="bi bi-collection-fill"></i> Groups</a>
-                            </li>
-                            <li class="nav-item">
-                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="nav-link btn btn-link"><i class="bi bi-box-arrow-right mt-2"></i> Logout</button>
-                                </form>
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}"><i class="bi bi-pencil-square"></i> Register</a>
-                            </li>
-                        @endauth
-                    </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+    @auth
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('home') }}">
+                <i class="bi bi-house-door-fill"></i> Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('friends.index') }}">
+                <i class="bi bi-people-fill"></i> Friends
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('messages.index') }}">
+                <i class="bi bi-chat-dots-fill"></i> Messages
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('groups.index') }}">
+                <i class="bi bi-collection-fill"></i> Groups
+            </a>
+        </li>
+        <li class="nav-item ">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="nav-link btn btn-link p-0">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </form>
+        </li>
+    @else
+        <li class="nav-item ms-2">
+            <a class="nav-link" href="{{ route('login') }}">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('register') }}">
+                <i class="bi bi-pencil-square"></i> Register
+            </a>
+        </li>
+    @endauth
+</ul>
+
                 </div>
             </div>
         </nav>
