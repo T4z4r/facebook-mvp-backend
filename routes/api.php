@@ -6,13 +6,18 @@ use App\Http\Controllers\Api\ApiMessageController;
 use App\Http\Controllers\Api\ApiGroupController;
 use App\Http\Controllers\Api\ApiNotificationController;
 use App\Http\Controllers\Api\ApiSearchController;
+use App\Http\Controllers\Api\ApiAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/register', [ApiAuthController::class, 'register']);
+Route::post('/login', [ApiAuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::post('/logout', [ApiAuthController::class, 'logout']);
 
     Route::get('/posts', [ApiPostController::class, 'index']);
     Route::post('/posts', [ApiPostController::class, 'store']);
