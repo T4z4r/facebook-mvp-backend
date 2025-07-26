@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -22,10 +23,20 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string',
-            'image_url' => 'nullable|url',
+            'image_upload' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
-        $post = Auth::user()->posts()->create($validated);
+        $postData = [
+            'content' => $validated['content'],
+        ];
+
+        if ($request->hasFile('image_upload')) {
+            $path = $request->file('image_upload')->store('posts', 'public');
+            $postData['image_url'] = Storage::url($path);
+        }
+
+        Auth::user()->posts()->create($postData);
+
         return redirect('/home')->with('status', 'Post created');
     }
 
@@ -38,14 +49,26 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $this->authorize('update', $post);
+
         $validated = $request->validate([
             'content' => 'required|string',
-            'image_url' => 'nullable|url',
+            'image_upload' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
-        $post->update($validated);
+        $updateData = [
+            'content' => $validated['content'],
+        ];
+
+        if ($request->hasFile('image_upload')) {
+            $path = $request->file('image_upload')->store('posts', 'public');
+            $updateData['image_url'] = Storage::url($path);
+        }
+
+        $post->update($updateData);
+
         return redirect('/home')->with('status', 'Post updated');
     }
+
 
     public function destroy(Post $post)
     {
